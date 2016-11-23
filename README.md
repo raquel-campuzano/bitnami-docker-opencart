@@ -52,13 +52,13 @@ If you want to run the application manually instead of using docker-compose, the
 1. Create a new network for the application and the database:
 
   ```bash
-  $ docker network create opencart_network
+  $ docker network create opencart-tier
   ```
 
 2. Start a MariaDB database in the network generated:
 
   ```bash
-  $ docker run -d --name mariadb --net=opencart_network bitnami/mariadb
+  $ docker run -d --name mariadb --net=opencart-tier bitnami/mariadb
   ```
 
   *Note:* You need to give the container a name in order to OpenCart to resolve the host
@@ -66,7 +66,7 @@ If you want to run the application manually instead of using docker-compose, the
 3. Run the OpenCart container:
 
   ```bash
-  $ docker run -d -p 80:80 --name opencart --net=opencart_network bitnami/opencart
+  $ docker run -d -p 80:80 --name opencart --net=opencart-tier bitnami/opencart
   ```
 
 Then you can access the OpenCart storefront at http://your-ip/. To access the administration area, logon to http://your-ip/admin
@@ -75,8 +75,8 @@ Then you can access the OpenCart storefront at http://your-ip/. To access the ad
 
 ## Persisting your application
 
-If you remove every container all your data will be lost, and the next time you run the image the application will be reinitialized. To avoid this loss of data, you should mount a volume that will persist even after the container is removed. 
- 
+If you remove every container all your data will be lost, and the next time you run the image the application will be reinitialized. To avoid this loss of data, you should mount a volume that will persist even after the container is removed.
+
  If you are using docker-compose your data will be persistent as long as you don't remove `mariadb_data` and `opencart_data` and `apache_data` volumes.
 
 To avoid inadvertent removal of these volumes you can [mount host directories as data volumes](https://docs.docker.com/engine/tutorials/dockervolumes/). Alternatively you can make use of volume plugins to host the volume data.
@@ -95,7 +95,7 @@ services:
   mariadb:
     image: 'bitnami/mariadb:latest'
     volumes:
-      - '/path/to/your/local/mariadb_data:/bitnami/mariadb'
+      - /path/to/mariadb-persistence:/bitnami/mariadb
   opencart:
     image: 'bitnami/opencart:latest'
     depends_on:
@@ -188,7 +188,7 @@ application:
  * For manual execution add a `-e` option with each variable and value:
 
 ```bash
- $ docker run -d -e OPENCART_PASSWORD=my_password -p 80:80 --name opencart -v /your/local/path/bitnami/opencart:/bitnami/opencart --network=opencart_network bitnami/opencart
+ $ docker run -d -e OPENCART_PASSWORD=my_password -p 80:80 --name opencart -v /your/local/path/bitnami/opencart:/bitnami/opencart --network=opencart-tier bitnami/opencart
 ```
 
 Available variables:
@@ -230,7 +230,7 @@ This would be an example of SMTP configuration using a GMail account:
  * For manual execution:
 
 ```bash
- $ docker run -d -e SMTP_HOST=smtp.gmail.com -e SMTP_PORT=587 -e SMTP_USER=your_email@gmail.com -e SMTP_PASSWORD=your_password -p 80:80 --name opencart -v /your/local/path/bitnami/opencart:/bitnami/opencart --net=opencart_network bitnami/opencart
+ $ docker run -d -e SMTP_HOST=smtp.gmail.com -e SMTP_PORT=587 -e SMTP_USER=your_email@gmail.com -e SMTP_PASSWORD=your_password -p 80:80 --name opencart -v /your/local/path/bitnami/opencart:/bitnami/opencart --net=opencart-tier bitnami/opencart
 ```
 
 # Backing up your application
